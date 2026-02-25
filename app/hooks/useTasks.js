@@ -1,6 +1,5 @@
 "use client"
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-
+import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { getTasks, addTask, updateTask, deleteTask } from "../services/taskApi";
 
 export const useTasks = () => {

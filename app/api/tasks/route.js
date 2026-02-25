@@ -19,7 +19,6 @@ export async function GET(request) {
 
     const totalPages = Math.ceil(totalItems / perPage);
 
-    // Format response to behave exactly like json-server v1
     const response = {
       first: 1,
       prev: page > 1 ? page - 1 : null,

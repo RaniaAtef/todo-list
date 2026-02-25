@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Paper, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Paper, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDeleteTask } from "../hooks/useTasks";
 import { Draggable } from "@hello-pangea/dnd";
@@ -14,7 +14,7 @@ const priorityColors = {
 const TaskCard = ({ task, index, onEdit }) => {
   const priority = task.priority?.toLowerCase() || "low";
   const colors = priorityColors[priority];
-  const { mutate: deleteTask } = useDeleteTask();
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
   
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
@@ -24,8 +24,10 @@ const TaskCard = ({ task, index, onEdit }) => {
   };
 
   const handleConfirmDelete = () => {
-    deleteTask(task.id);
-    setConfirmOpen(false);
+    deleteTask(task.id, {
+      onSuccess: () => setConfirmOpen(false),
+      onError: () => setConfirmOpen(false),
+    });
   };
 
   return (
@@ -46,6 +48,8 @@ const TaskCard = ({ task, index, onEdit }) => {
               cursor: "pointer",
               transition: "transform 0.1s ease-in-out, box-shadow 0.1s",
               boxShadow: snapshot.isDragging ? "0 10px 15px -3px rgb(0 0 0 / 0.1)" : "none",
+              // Dim the card while delete is in progress
+              opacity: isDeleting ? 0.5 : 1,
               "&:hover": {
                 transform: snapshot.isDragging ? "none" : "translateY(-2px)",
                 boxShadow: snapshot.isDragging ? "0 10px 15px -3px rgb(0 0 0 / 0.1)" : "0 4px 6px -1px rgb(0 0 0 / 0.1)"
@@ -66,9 +70,13 @@ const TaskCard = ({ task, index, onEdit }) => {
               <IconButton 
                 onClick={handleDeleteClick} 
                 size="small"
+                disabled={isDeleting}
                 sx={{ color: "#9CA3AF", "&:hover": { color: "#EF4444" }, mt: -0.5, mr: -1 }}
               >
-                <DeleteIcon fontSize="small" />
+                {isDeleting 
+                  ? <CircularProgress size={16} sx={{ color: "#EF4444" }} /> 
+                  : <DeleteIcon fontSize="small" />
+                }
               </IconButton>
             </Box>
 
@@ -103,17 +111,30 @@ const TaskCard = ({ task, index, onEdit }) => {
       {/* Delete Confirmation */}
       <Dialog 
         open={confirmOpen} 
-        onClose={() => setConfirmOpen(false)}
+        onClose={() => !isDeleting && setConfirmOpen(false)}
         onClick={(e) => e.stopPropagation()}
       >
         <DialogTitle sx={{ fontWeight: 700 }}>Delete Task</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this task?</Typography>
+          <Typography>Are you sure you want to delete "<strong>{task.title}</strong>"?</Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setConfirmOpen(false)} sx={{ color: "#6B7280" }}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} variant="contained" color="error" sx={{ fontWeight: 700 }}>
-            Delete
+          <Button 
+            onClick={() => setConfirmOpen(false)} 
+            disabled={isDeleting}
+            sx={{ color: "#6B7280" }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            variant="contained" 
+            color="error" 
+            disabled={isDeleting}
+            startIcon={isDeleting ? <CircularProgress size={16} sx={{ color: "white" }} /> : null}
+            sx={{ fontWeight: 700, minWidth: 100 }}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>

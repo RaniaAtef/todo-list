@@ -8,7 +8,8 @@ import {
   Button, 
   TextField, 
   MenuItem, 
-  Box 
+  Box,
+  CircularProgress
 } from "@mui/material"
 import { useAddTask, useUpdateTask } from "../hooks/useTasks"
 
@@ -19,8 +20,11 @@ const PRIORITIES = [
 ]
 
 const TaskModal = ({ open, onClose, task }) => {
-  const { mutate: addTask } = useAddTask()
-  const { mutate: updateTask } = useUpdateTask()
+  const { mutate: addTask, isPending: isAdding } = useAddTask()
+  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask()
+
+  const isLoading = isAdding || isUpdating;
+  const isEditing = !!(task?.id && task.id !== undefined && typeof task.id !== 'object');
 
   const [formData, setFormData] = useState({
     title: "",
@@ -64,7 +68,7 @@ const TaskModal = ({ open, onClose, task }) => {
       return
     }
 
-    if (task?.id && task.id !== undefined && typeof task.id !== 'object') {
+    if (isEditing) {
       updateTask({ id: task.id, data: formData }, {
         onSuccess: () => onClose()
       })
@@ -76,10 +80,15 @@ const TaskModal = ({ open, onClose, task }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog 
+      open={open} 
+      onClose={isLoading ? undefined : onClose}  // Prevent closing while loading
+      fullWidth 
+      maxWidth="sm"
+    >
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={{ fontWeight: 700 }}>
-          {task?.id ? "Edit Task" : "Add New Task"}
+          {isEditing ? "Edit Task" : "Add New Task"}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
@@ -91,6 +100,7 @@ const TaskModal = ({ open, onClose, task }) => {
               onChange={handleChange}
               error={!!errors.title}
               helperText={errors.title}
+              disabled={isLoading}
             />
             
             <TextField
@@ -101,6 +111,7 @@ const TaskModal = ({ open, onClose, task }) => {
               rows={3}
               value={formData.description}
               onChange={handleChange}
+              disabled={isLoading}
             />
 
             <TextField
@@ -110,6 +121,7 @@ const TaskModal = ({ open, onClose, task }) => {
               fullWidth
               value={formData.priority}
               onChange={handleChange}
+              disabled={isLoading}
             >
               {PRIORITIES.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -120,19 +132,29 @@ const TaskModal = ({ open, onClose, task }) => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={onClose} sx={{ color: "#6B7280", fontWeight: 600 }}>
+          <Button 
+            onClick={onClose} 
+            disabled={isLoading}
+            sx={{ color: "#6B7280", fontWeight: 600 }}
+          >
             Cancel
           </Button>
           <Button 
             type="submit" 
             variant="contained" 
+            disabled={isLoading}
+            startIcon={isLoading ? <CircularProgress size={16} sx={{ color: "white" }} /> : null}
             sx={{ 
               backgroundColor: "#2563EB", 
               fontWeight: 700,
+              minWidth: 130,
               "&:hover": { backgroundColor: "#1D4ED8" }
             }}
           >
-            {task?.id ? "Update Task" : "Create Task"}
+            {isLoading 
+              ? (isEditing ? "Updating..." : "Creating...") 
+              : (isEditing ? "Update Task" : "Create Task")
+            }
           </Button>
         </DialogActions>
       </form>

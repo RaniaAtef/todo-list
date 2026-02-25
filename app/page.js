@@ -11,29 +11,20 @@ import { useState, useEffect, useMemo } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
 
 export default function Home() {
-  const { search, setSearch } = useTaskStore()
-  const { 
-    data: infiniteData, 
-    fetchNextPage, 
-    hasNextPage, 
-    isFetchingNextPage 
-  } = useTasks()
-  const { mutate: updateTask } = useUpdateTask()
-  
+  const { search } = useTaskStore();
+  const { data: infiniteData, fetchNextPage, hasNextPage, isFetchingNextPage } = useTasks();
+  const { mutate: updateTask } = useUpdateTask();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [isReady, setIsReady] = useState(false);
-  
-  // Flatten infinite pages into a single array - stable reference
-  const serverTasks = useMemo(() => 
-    infiniteData?.pages.map(page => page.data).flat() || [], 
-    [infiniteData?.pages]
-  );
-  
-  // Local state to prevent flicker during drag and drop
   const [boardTasks, setBoardTasks] = useState([]);
 
-  // Sync server tasks to local state
+  const serverTasks = useMemo(
+    () => infiniteData?.pages.map(page => page.data).flat() || [],
+    [infiniteData?.pages]
+  );
+
   useEffect(() => {
     setBoardTasks(serverTasks);
   }, [serverTasks]);
@@ -43,7 +34,7 @@ export default function Home() {
   }, []);
 
   const handleAddTask = (columnId) => {
-    setEditingTask({ column: columnId }); 
+    setEditingTask({ column: columnId });
     setModalOpen(true);
   };
 
@@ -61,56 +52,37 @@ export default function Home() {
     const { destination, source, draggableId } = result;
 
     if (!destination) return;
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
-
-    const updatedTasks = boardTasks.map(task => {
-      if (task.id.toString() === draggableId) {
-        return { ...task, column: destination.droppableId };
-      }
-      return task;
-    });
-  
+    const updatedTasks = boardTasks.map(task =>
+      task.id.toString() === draggableId
+        ? { ...task, column: destination.droppableId }
+        : task
+    );
     setBoardTasks(updatedTasks);
 
     const task = boardTasks.find(t => t.id.toString() === draggableId);
     if (task) {
-      updateTask({ 
-        id: task.id, 
-        data: { ...task, column: destination.droppableId } 
-      });
+      updateTask({ id: task.id, data: { ...task, column: destination.droppableId } });
     }
   };
 
-  const filteredTasks = boardTasks.filter((task) => {
-    const searchTerm = search.toLowerCase();
-    return (
-      task?.title?.toLowerCase().includes(searchTerm) || 
-      task?.description?.toLowerCase().includes(searchTerm)
-    );
-  });
+  const filteredTasks = boardTasks.filter(task =>
+    task?.title?.toLowerCase().includes(search.toLowerCase()) ||
+    task?.description?.toLowerCase().includes(search.toLowerCase())
+  );
 
   if (!isReady) return null;
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Box sx={{ 
-        backgroundColor: "#F9FAFB", 
-        minHeight: "100vh", 
-        p: 4 
-      }}>
-        {/* Header */}
+      <Box sx={{ backgroundColor: "#F9FAFB", minHeight: "100vh", p: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 6 }}>
-          <Box 
-            sx={{ 
-              width: 40, 
-              height: 40, 
-              backgroundColor: "#2563EB", 
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              backgroundColor: "#2563EB",
               borderRadius: 2,
               display: "flex",
               alignItems: "center",
@@ -136,23 +108,14 @@ export default function Home() {
           <SearchBar />
         </Box>
 
-        {/* Board Container */}
-        <Box 
-          sx={{ 
-            display: "flex", 
-            gap: 3, 
-            alignItems: "flex-start",
-            overflowX: "auto",
-            pb: 2
-          }}
-        >
+        <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start", overflowX: "auto", pb: 2 }}>
           {COLUMNS.map((column) => {
-            const columnTasks = filteredTasks.filter((task) => task.column === column.id);
+            const columnTasks = filteredTasks.filter(task => task.column === column.id);
             return (
-              <Column 
-                key={column.id} 
+              <Column
+                key={column.id}
                 id={column.id}
-                title={column.title} 
+                title={column.title}
                 color={column.color}
                 count={columnTasks.length}
                 onAddClick={() => handleAddTask(column.id)}
@@ -161,23 +124,19 @@ export default function Home() {
                 isLoadingMore={isFetchingNextPage}
               >
                 {columnTasks.map((task, index) => (
-                  <TaskCard 
-                    key={task.id} 
-                    task={task} 
+                  <TaskCard
+                    key={task.id}
+                    task={task}
                     index={index}
                     onEdit={() => handleEditTask(task)}
                   />
                 ))}
               </Column>
-            )
+            );
           })}
         </Box>
 
-        <TaskModal 
-          open={modalOpen} 
-          onClose={closeModal} 
-          task={editingTask} 
-        />
+        <TaskModal open={modalOpen} onClose={closeModal} task={editingTask} />
       </Box>
     </DragDropContext>
   );
