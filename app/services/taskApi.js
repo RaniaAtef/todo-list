@@ -3,9 +3,13 @@ import axios from "axios";
 const API_URL = "/api/tasks";
 
 export const getTasks = async (page = 1, limit = 10) => {
-    // response = { first, prev, next, last, pages, items, data: [tasks] }
+    // response = { first, prev, next, last, pages, items, data: Task[] }
     const { data: response } = await axios.get(`${API_URL}?_page=${page}&_per_page=${limit}`);
-    return response; // useInfiniteQuery stores this as a "page"; tasks are at page.data
+    // Map MongoDB's _id to id so existing UI logic continues working
+    const tasks = response.data.map(task => ({ ...task, id: task._id || task.id }));
+    // Return full pagination object so useInfiniteQuery's getNextPageParam (lastPage.next)
+    // and page.js's page.data both continue to work without changes
+    return { ...response, data: tasks };
 };
 
 export const addTask = async (task) => {
