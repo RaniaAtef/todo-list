@@ -48,7 +48,6 @@ const TaskCard = ({ task, index, onEdit }) => {
               cursor: "pointer",
               transition: "transform 0.1s ease-in-out, box-shadow 0.1s",
               boxShadow: snapshot.isDragging ? "0 10px 15px -3px rgb(0 0 0 / 0.1)" : "none",
-              // Dim the card while delete is in progress
               opacity: isDeleting ? 0.5 : 1,
               "&:hover": {
                 transform: snapshot.isDragging ? "none" : "translateY(-2px)",
@@ -108,7 +107,6 @@ const TaskCard = ({ task, index, onEdit }) => {
         )}
       </Draggable>
 
-      {/* Delete Confirmation */}
       <Dialog 
         open={confirmOpen} 
         onClose={() => !isDeleting && setConfirmOpen(false)}

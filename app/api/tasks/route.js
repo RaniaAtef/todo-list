@@ -13,7 +13,7 @@ export async function GET(request) {
 
     const [tasks, totalItems] = await Promise.all([
       Task.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 })
-        .sort({ _id: 1 }).skip(skip).limit(perPage).lean(),
+        .sort({ order: 1, _id: 1 }).skip(skip).limit(perPage).lean(),
       Task.countDocuments()
     ]);
 
@@ -41,10 +41,11 @@ export async function POST(request) {
     await connectToDatabase();
 
     const body = await request.json();
-    const { title, description, column, priority } = body;
+    const { title, description, column, priority, order } = body;
     const newId = body.id || Math.random().toString(36).substring(2, 9);
 
-    const task = await Task.create({ id: newId, title, description, column, priority });
+    const taskOrder = order !== undefined ? order : Date.now();
+    const task = await Task.create({ id: newId, title, description, column, priority, order: taskOrder });
 
     return NextResponse.json(task.toJSON(), { status: 201 });
   } catch (error) {

@@ -27,7 +27,7 @@ const Column = ({ id, title, color, count, onAddClick, children, onLoadMore, has
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        height: "80vh", // Fixed height for vertical scroll
+        height: "80vh", 
         boxShadow: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)"
       }}
     >
@@ -76,7 +76,7 @@ const Column = ({ id, title, color, count, onAddClick, children, onLoadMore, has
               flexDirection: "column", 
               gap: 1.5,
               flexGrow: 1,
-              overflowY: "auto", // Enable vertical scroll
+              overflowY: "auto", 
               overflowX: "hidden",
               px: 0.5,
               transition: "background-color 0.2s ease",
@@ -100,7 +100,6 @@ const Column = ({ id, title, color, count, onAddClick, children, onLoadMore, has
             {children}
             {provided.placeholder}
             
-            {/* Infinite Scroll */}
             <Box ref={ref} sx={{ height: 20, display: "flex", justifyContent: "center", py: 1 }}>
               {isLoadingMore && <CircularProgress size={20} />}
             </Box>

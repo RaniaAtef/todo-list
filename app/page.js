@@ -26,7 +26,11 @@ export default function Home() {
   );
 
   useEffect(() => {
-    setBoardTasks(serverTasks);
+    const initializedTasks = serverTasks.map((t, i) => ({ 
+      ...t, 
+      order: typeof t.order === 'number' ? t.order : i * 1000 
+    }));
+    setBoardTasks(initializedTasks);
   }, [serverTasks]);
 
   useEffect(() => {
@@ -54,16 +58,38 @@ export default function Home() {
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-    const updatedTasks = boardTasks.map(task =>
+    const allTasksWithOrder = boardTasks.map((t, i) => ({ 
+      ...t, 
+      order: typeof t.order === 'number' ? t.order : i * 1000 
+    }));
+
+    const destTasks = allTasksWithOrder
+      .filter(t => t.column === destination.droppableId && t.id.toString() !== draggableId)
+      .sort((a, b) => a.order - b.order);
+
+    let newOrder;
+    if (destTasks.length === 0) {
+      newOrder = Date.now();
+    } else if (destination.index === 0) {
+      newOrder = destTasks[0].order - 1000;
+    } else if (destination.index >= destTasks.length) {
+      newOrder = destTasks[destTasks.length - 1].order + 1000;
+    } else {
+      const prevOrder = destTasks[destination.index - 1].order;
+      const nextOrder = destTasks[destination.index].order;
+      newOrder = prevOrder + (nextOrder - prevOrder) / 2;
+    }
+
+    const updatedTasks = allTasksWithOrder.map(task =>
       task.id.toString() === draggableId
-        ? { ...task, column: destination.droppableId }
+        ? { ...task, column: destination.droppableId, order: newOrder }
         : task
     );
     setBoardTasks(updatedTasks);
 
-    const task = boardTasks.find(t => t.id.toString() === draggableId);
+    const task = allTasksWithOrder.find(t => t.id.toString() === draggableId);
     if (task) {
-      updateTask({ id: task.id, data: { ...task, column: destination.droppableId } });
+      updateTask({ id: task.id, data: { ...task, column: destination.droppableId, order: newOrder } });
     }
   };
 
@@ -110,7 +136,9 @@ export default function Home() {
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start", overflowX: "auto", pb: 2 }}>
           {COLUMNS.map((column) => {
-            const columnTasks = filteredTasks.filter(task => task.column === column.id);
+            const columnTasks = filteredTasks
+              .filter(task => task.column === column.id)
+              .sort((a, b) => (a.order || 0) - (b.order || 0));
             return (
               <Column
                 key={column.id}

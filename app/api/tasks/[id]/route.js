@@ -7,11 +7,11 @@ export async function PUT(request, { params }) {
     await connectToDatabase();
 
     const { id } = await params;
-    const { title, description, column, priority } = await request.json();
+    const { title, description, column, priority, order } = await request.json();
 
     const task = await Task.findOneAndUpdate(
       { id },
-      { title, description, column, priority },
+      { title, description, column, priority, order },
       { new: true }
     );
 

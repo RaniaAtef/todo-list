@@ -6,6 +6,7 @@ const TaskSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   column: { type: String, required: true },
   priority: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+  order: { type: Number },
 }, {
 
   timestamps: true, 

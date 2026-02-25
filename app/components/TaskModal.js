@@ -82,7 +82,7 @@ const TaskModal = ({ open, onClose, task }) => {
   return (
     <Dialog 
       open={open} 
-      onClose={isLoading ? undefined : onClose}  // Prevent closing while loading
+      onClose={isLoading ? undefined : onClose}  
       fullWidth 
       maxWidth="sm"
     >
