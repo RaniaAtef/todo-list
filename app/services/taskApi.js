@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/tasks";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api/tasks";
 
 export const getTasks = async (page = 1, limit = 10) => {
     const { data } = await axios.get(`${API_URL}?_page=${page}&_per_page=${limit}`);
