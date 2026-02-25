@@ -12,7 +12,8 @@ export async function GET(request) {
     const skip = (page - 1) * perPage;
 
     const [tasks, totalItems] = await Promise.all([
-      Task.find().sort({ _id: 1 }).skip(skip).limit(perPage).lean(),
+      Task.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 })
+        .sort({ _id: 1 }).skip(skip).limit(perPage).lean(),
       Task.countDocuments()
     ]);
 
