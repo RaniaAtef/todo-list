@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api/tasks";
+const API_URL = "/api/tasks";
 
 export const getTasks = async (page = 1, limit = 10) => {
-    const { data } = await axios.get(`${API_URL}?_page=${page}&_per_page=${limit}`);
-    return data;
+    // response = { first, prev, next, last, pages, items, data: [tasks] }
+    const { data: response } = await axios.get(`${API_URL}?_page=${page}&_per_page=${limit}`);
+    return response; // useInfiniteQuery stores this as a "page"; tasks are at page.data
 };
 
 export const addTask = async (task) => {
