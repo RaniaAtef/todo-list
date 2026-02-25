@@ -1,0 +1,102 @@
+{
+  "tasks": [
+    {
+      "id": "2",
+      "title": "Unit tests",
+      "description": "Write tests for utility functions and hooks",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "3",
+      "title": "Performance audit",
+      "description": "Lighthouse scores and bundle analysis",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "4",
+      "title": "Notification system",
+      "description": "Toast notifications and in-app alerts",
+      "column": "backlog",
+      "priority": "medium"
+    },
+    {
+      "id": "5",
+      "title": "User settings page",
+      "description": "Profile editing, preferences, and account management",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "8",
+      "title": "Dark mode support",
+      "description": "Add theme toggle and CSS variable switching",
+      "column": "review",
+      "priority": "medium"
+    },
+    {
+      "id": "9",
+      "title": "Dashboard layout",
+      "description": "Build responsive sidebar and main content area",
+      "column": "in_progress",
+      "priority": "medium"
+    },
+    {
+      "id": "10",
+      "title": "Design system tokens",
+      "description": "Set up color palette, typography, and spacing scales",
+      "column": "done",
+      "priority": "high"
+    },
+    {
+      "id": "6f47",
+      "title": "test the flicker issue",
+      "description": "test",
+      "column": "done",
+      "priority": "high"
+    },
+    {
+      "id": "39ea",
+      "title": "test1",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "954b",
+      "title": "test2",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "3878",
+      "title": "test3",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "d7f1",
+      "title": "testt4",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "0de4",
+      "title": "test5",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    },
+    {
+      "id": "188d",
+      "title": "test6",
+      "description": "",
+      "column": "backlog",
+      "priority": "low"
+    }
+  ]
+}
