@@ -5,6 +5,7 @@ import Column from "./components/Column";
 import TaskCard from "./components/TaskCard";
 import TaskModal from "./components/TaskModal";
 import SearchBar from "./components/SearchBar";
+import Loader from "./components/Loader";
 import { useTaskStore } from "./store/taskStore";
 import { Box, Typography } from "@mui/material";
 import { useState, useEffect, useMemo } from "react";
@@ -12,7 +13,7 @@ import { DragDropContext } from "@hello-pangea/dnd";
 
 export default function Home() {
   const { search } = useTaskStore();
-  const { data: infiniteData, fetchNextPage, hasNextPage, isFetchingNextPage } = useTasks();
+  const { data: infiniteData, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: tasksLoading } = useTasks();
   const { mutate: updateTask } = useUpdateTask();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,11 +31,13 @@ export default function Home() {
       ...t, 
       order: typeof t.order === 'number' ? t.order : i * 1000 
     }));
-    setBoardTasks(initializedTasks);
+    const id = setTimeout(() => setBoardTasks(initializedTasks), 0);
+    return () => clearTimeout(id);
   }, [serverTasks]);
 
   useEffect(() => {
-    setIsReady(true);
+    const id = setTimeout(() => setIsReady(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   const handleAddTask = (columnId) => {
@@ -99,6 +102,7 @@ export default function Home() {
   );
 
   if (!isReady) return null;
+  if (tasksLoading) return <Loader />;
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
